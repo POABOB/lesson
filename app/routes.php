@@ -7,9 +7,11 @@ use core\lib\IP;
 if(!isset($_SESSION['user'])) $_SESSION['user'] = false;
 
 
-$router->get("/doc", function() { require(PPP . '/static/doc/index.php'); });
 
-$router->mount('/api', function() use ($router) {
+// $router->mount('/api', function() use ($router) {
+    
+    $router->get("/doc", function() { require(PPP . '/static/doc/index.php'); });
+
     $router->get("/swagger", function() {
         $openapi = \OpenApi\Generator::scan([APP . '/controller']);
         header('Content-Type: application/json');
@@ -45,5 +47,5 @@ $router->mount('/api', function() use ($router) {
     //info OK
     $router->get('/info', function() { auth::factory()->user_info('Session 過期，請重新再登入'); });
 
-});
+// });
 
