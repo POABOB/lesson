@@ -1,0 +1,24 @@
+vendor/
+something/
+log/*
+core/config/database.php
+vue-admin-template/node_modules
+public/*
+static/*
+index.php
+*.zip
+vue-admin-template/.DS_Store
+vue-admin-template/dist/
+vue-admin-template/npm-debug.log*
+vue-admin-template/yarn-debug.log*
+vue-admin-template/yarn-error.log*
+vue-admin-template/package-lock.json
+vue-admin-template/tests/**/coverage/
+
+# Editor directories and files
+vue-admin-template/.idea
+vue-admin-template/.vscode
+vue-admin-template/*.suo
+vue-admin-template/*.ntvs*
+vue-admin-template/*.njsproj
+vue-admin-template/*.sln
