@@ -7,7 +7,14 @@ use core\lib\Validator;
 use core\lib\JWT;
 use core\lib\IP;
 /**
- * @OA\Info(title="LESSON API", version="1.0", description="roles=999帳密：admin/admin1111password<br>roles=3帳密：user1/user1<br>roles=2帳密：user2/user2")
+ * @OA\Info(title="LESSON API", version="1.0", description="
+ * roles=999，系統ADMIN，可以對任何資料進行操作，<br>
+ * 帳密：admin/admin1111password<br>
+ * roles=3，診所管理者，只由ADMIN新增，可以操作自己診所的任何事情，<br>
+ * 帳密：user1/user1<br>
+ * roles=2，診所使用者，可由ADMIN、管理者新增，只可以修改自己的資料、密碼，操作扣課<br>
+ * 帳密：user2/user2
+ * ")
  * @OA\OpenApi(tags={
  *      {"name"="登入登出", "description"="登入登出 API"},
  *      {"name"="後台診所管理", "description"="後台診所管理 API"},
