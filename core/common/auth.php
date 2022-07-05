@@ -20,24 +20,24 @@ class auth {
         }
     }
 
-    public function clinic($msg = 'Permission denied') {
+    public function users($msg = 'Permission denied') {
         $token = JWT::getHeaders();
         $payload = JWT::verifyToken($token);
-        if($payload == false || intval($payload['roles']) < 3 || intval($payload['active']) == 0) {
+        if($payload == false || intval($payload['roles']) < 2 || intval($payload['active']) == 0) {
             json(new resModel(403, $msg));
             exit();
         }
     }
 
-    // public function user_info($msg = 'Permission denied') {
-    //     $token = JWT::getHeaders();
-    //     $payload = JWT::verifyToken($token);
-    //     if($payload == false || intval($payload['roles']) !== 2) {
-    //         json(new resModel(403, $msg));
-    //         exit();
-    //     } else {
-    //         json(new resModel(200, $payload));
-    //         exit();
-    //     }
-    // }
+    public function user_info($msg = 'Permission denied') {
+        $token = JWT::getHeaders();
+        $payload = JWT::verifyToken($token);
+        if($payload == false) {
+            json(new resModel(403, $msg));
+            exit();
+        } else {
+            json(new resModel(200, $payload));
+            exit();
+        }
+    }
 }

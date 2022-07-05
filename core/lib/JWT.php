@@ -43,8 +43,8 @@ class Jwt {
     }
 
     public static function getHeaders() {
-        // $headers = apache_request_headers();
-        $headers = get_HTTP_request_headers();
+        $headers = apache_request_headers();
+        // $headers = get_HTTP_request_headers();
         $token = "";
         if(isset($headers['Authorization'])) {
             $token = explode(" ", $headers['Authorization']);

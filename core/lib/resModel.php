@@ -14,8 +14,12 @@ class resModel {
             204 => 'No Content',
             400 => 'Bad Request',
             401 => 'Unauthorized',
+            402 => '...',
             403 => 'Forbidden',
             404 => 'Not Found',
+            405 => '...',
+            406 => '...',
+            407 => '...',
         );
 
         // http_response_code($status);

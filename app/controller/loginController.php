@@ -11,6 +11,9 @@ use core\lib\IP;
  * @OA\OpenApi(tags={
  *      {"name"="登入登出", "description"="登入登出 API"},
  *      {"name"="後台診所管理", "description"="後台診所管理 API"},
+ *      {"name"="診所使用者管理", "description"="診所使用者管理 API<br>(roles=999可以操作所有user，roles=3可以操作自己診所的users，roles=2只能優改自己的基本資料和密碼)"},
+ *      {"name"="診所扣課管理", "description"="診所扣課管理 API"},
+ *      {"name"="診所LOG", "description"="診所LOG API"},
  * })
  * @OA\SecurityScheme(
  *      securityScheme="Authorization",
@@ -33,8 +36,8 @@ class loginController extends \core\PPP {
      *              mediaType="json",
      *              @OA\Schema(
      *                  required={"ID", "password"},
-     *                  @OA\Property(property="account", type="string(15)", example="A123456789"),
-     *                  @OA\Property(property="password", type="string(64)", example="admin"),
+     *                  @OA\Property(property="account", type="string(15)", example="admin"),
+     *                  @OA\Property(property="password", type="string(64)", example="admin1111password"),
      *              )
      *          )
      *      ),
@@ -73,23 +76,17 @@ class loginController extends \core\PPP {
 		$data = $database->login(array('account' => $post['account'],'password' => md5($post['password'])));
 
 		//有則加入SESSION，沒有就返回Error
-		if($data) {
-            // 判斷IP
-            IP::factory()->check_ip(json_decode($data['allowed_ip'])); 
-
-            if(intval($data['active']) == 0) {
-                // 判斷active
-                json(new resModel(403, '該帳號尚未被啟用!'));
-                exit();
-            } else {
-                $payload=array('clinic_id' => $data['clinic_id'], 'name' => $data['name'], 'roles' => $data['roles'], 'allowed_ip' => json_decode($data['allowed_ip']),'iat'=>time(),'exp'=>time()+60*60*24*30,'nbf'=>time());
-                $token = JWT::getToken($payload);
-                $_SESSION['user'] = $token;
-                json(new resModel(200, array('token' => $token), '登入成功'));
-            }
-
-		} else {
-			json(new resModel(400, '帳號或密碼錯誤'));
+		if($data == -2) {
+			json(new resModel(400, '該診所未啟用!'));
+        } else if($data == -1) {
+			json(new resModel(400, '該使用者未啟用!'));
+        } else if($data == 0) {
+			json(new resModel(400, '帳號或密碼錯誤!'));
+        } else {
+            $payload=array_merge($data, array('iat'=>time(),'exp'=>time()+60*60*24*30,'nbf'=>time()));
+            $token = JWT::getToken($payload);
+            $_SESSION['user'] = $token;
+            json(new resModel(200, array('token' => $token), '登入成功!'));
 		}
 	}
 
