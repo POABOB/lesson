@@ -8,41 +8,7 @@ use core\common\auth;
 use core\lib\JWT;
 
 class userController extends \core\PPP {
-    //ADMIN可以任意操作
-    private function roles_auth($clinic_id) {
-        if($clinic_id == null) {
-            json(new resModel(401, "無法獲取診所ID"));
-            exit();
-        }
 
-        $token = JWT::getHeaders();
-        $payload = JWT::verifyToken($token);
-
-        if(intval($payload['roles']) !== 999) {
-            if($payload['clinic_id'] !== $clinic_id) {
-                json(new resModel(400, "無法操作其他診所"));
-                exit();
-            }
-        }
-    }
-
-    private function auth($min = 3) {
-        $token = JWT::getHeaders();
-        $payload = JWT::verifyToken($token);
-        if(intval($payload['roles']) < $min) {
-            json(new resModel(403, "Permission Denied"));
-            exit();
-        }
-    }
-
-    private function check_self($min = 3, $user_id = 0) {
-        $token = JWT::getHeaders();
-        $payload = JWT::verifyToken($token);
-        if(intval($payload['roles']) < $min && intval($user_id) !== intval($payload['user_id'])) {
-            json(new resModel(403, "只能操作自己的資料"));
-            exit();
-        }
-    }
 
     /**
      * @OA\Get(
@@ -113,7 +79,7 @@ class userController extends \core\PPP {
      * )
      */
     public function index_($clinic_id = null) {
-        $this->roles_auth($clinic_id);
+        auth::factory()->roles_auth($clinic_id);
         $database = new userModel();
         $data = $database->get_user(
             array(
@@ -164,8 +130,8 @@ class userController extends \core\PPP {
      * )
      */
     public function insert_($clinic_id = null) {
-        $this->roles_auth($clinic_id);
-        $this->auth(3);
+        auth::factory()->roles_auth($clinic_id);
+        auth::factory()->auth(3);
         $post = array();
         $post = post_json();
 
@@ -254,7 +220,7 @@ class userController extends \core\PPP {
     public function update_($clinic_id = null) {
         $token = JWT::getHeaders();
         $payload = JWT::verifyToken($token);
-        $this->roles_auth($clinic_id);
+        auth::factory()->roles_auth($clinic_id);
         $post = array();
         $post = post_json();
 
@@ -281,7 +247,7 @@ class userController extends \core\PPP {
         }
 
         
-        $this->check_self(3, $post['user_id']);
+        auth::factory()->check_self(3, $post['user_id']);
         if(intval($payload['roles']) == 2) {
             $post['roles'] = '2';
         }
@@ -348,8 +314,8 @@ class userController extends \core\PPP {
      * )
      */
     public function delete_($clinic_id = null) {
-        $this->roles_auth($clinic_id);
-        $this->auth(3);
+        auth::factory()->roles_auth($clinic_id);
+        auth::factory()->auth(3);
         $post = array();
         $post = post_json();
 
@@ -420,8 +386,8 @@ class userController extends \core\PPP {
      * )
      */
     public function delete_back($clinic_id = null) {
-        $this->roles_auth($clinic_id);
-        $this->auth(3);
+        auth::factory()->roles_auth($clinic_id);
+        auth::factory()->auth(3);
         $post = array();
         $post = post_json();
 
@@ -493,7 +459,7 @@ class userController extends \core\PPP {
      * )
      */
     public function update_password($clinic_id = null) {
-        $this->roles_auth($clinic_id);
+        auth::factory()->roles_auth($clinic_id);
         $post = array();
         $post = post_json();
 
@@ -509,7 +475,7 @@ class userController extends \core\PPP {
             return;
         }
 
-        $this->check_self(3, $post['user_id']);
+        auth::factory()->check_self(3, $post['user_id']);
 
         $database = new userModel();
         $return = $database->update_user_password(

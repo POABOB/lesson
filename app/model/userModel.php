@@ -20,20 +20,6 @@ class userModel extends model {
         return  0;
     }
 
-    public function update_all_clinic($para = array(), $where = array(), $table = 'Users') {
-        if($this->has($table, array('account' => $para['account'], 'clinic_id[!]' => $where['clinic_id']))) {
-            return -1;
-        } else {
-            $this->update($table, $para, $where);
-            $err = $this->error;
-            if($err == null) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-    }
-
     public function update_user($para = array(), $where = array(), $table = 'Users') {
       if($this->has($table, array('account' => $para['account'], 'user_id[!]' => $where['user_id']))) {
         return -1;

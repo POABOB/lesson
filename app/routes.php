@@ -47,13 +47,16 @@ if(!isset($_SESSION['user'])) $_SESSION['user'] = false;
 
     // LOG
     $router->get('/logs', 'logController@index_');
+    
+    // HIS
+    $router->get('/his/(\w+)', 'hisController@index_');
 
     // ADMIN || USER
-    $router->get('/lesson', 'lessonController@index_');
-    $router->post('/lesson', 'lessonController@insert_');
-    $router->patch('/lesson', 'lessonController@update_');
-    $router->delete('/lesson', 'lessonController@delete_');
-    $router->patch('/lesson/back', 'lessonController@delete_back');
+    $router->get('/lessons', 'lessonController@index_');
+    $router->post('/lessons/request', 'lessonController@insert_');
+    $router->delete('/lessons/request', 'lessonController@cancel_');
+    $router->patch('/lessons/response', 'lessonController@approve_');
+    $router->delete('/lessons/response', 'lessonController@reject_');
 
 
 // });

@@ -11,9 +11,9 @@ class clinicModel extends model {
                     COUNT(l.lesson_id) AS lesson_count
             FROM    Clinic c
             LEFT JOIN Lessons l
-            ON c.clinic_id = l.request_clinic_id AND c.clinic_id > {$where['clinic_id']}
+            ON c.clinic_id = l.request_clinic_id
             GROUP BY (c.clinic_id)
-            LIMIT {$where['LIMIT']};
+            LIMIT {$where['clinic_id']}, {$where['LIMIT']};
         ")->fetchAll(\PDO::FETCH_ASSOC);
     }
 

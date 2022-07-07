@@ -39,6 +39,7 @@ class clinicController extends \core\PPP {
      *                  @OA\Property(property="flat", type="array",
      *                     @OA\Items(type="object",
      *                          @OA\Property(property="clinic_id", type="int(11)", example="1"),
+     *                          @OA\Property(property="clinic_sn", type="string(10)", example="XXXXXXXXXX"),
      *                          @OA\Property(property="name", type="string(128)", example="XX診所"),
      *                          @OA\Property(property="active", type="string(1)", example="1"),
      *                          @OA\Property(property="parent_id", type="int(11)", example="0"),
@@ -49,6 +50,7 @@ class clinicController extends \core\PPP {
      *                  @OA\Property(property="parent_children", type="array",
      *                     @OA\Items(type="object",
      *                          @OA\Property(property="clinic_id", type="int(11)", example="1"),
+     *                          @OA\Property(property="clinic_sn", type="string(10)", example="XXXXXXXXXX"),
      *                          @OA\Property(property="name", type="string(128)", example="XX診所"),
      *                          @OA\Property(property="active", type="string(1)", example="1"),
      *                          @OA\Property(property="parent_id", type="int(11)", example="0"),
@@ -57,6 +59,7 @@ class clinicController extends \core\PPP {
      *                          @OA\Property(property="children", type="array",
      *                              @OA\Items(type="object",
      *                                  @OA\Property(property="clinic_id", type="int(11)", example="1"),
+     *                                  @OA\Property(property="clinic_sn", type="string(10)", example="XXXXXXXXXX"),
      *                                  @OA\Property(property="name", type="string(128)", example="XX診所"),
      *                                  @OA\Property(property="active", type="string(1)", example="1"),
      *                                  @OA\Property(property="parent_id", type="int(11)", example="0"),
@@ -149,8 +152,9 @@ class clinicController extends \core\PPP {
      *          @OA\MediaType(
      *              mediaType="json",
      *              @OA\Schema(
-     *                  required={"name", "parent_id",},
+     *                  required={"name", "clinic_sn", "parent_id",},
      *                  @OA\Property(property="name", type="string(64)", example="診所A"),
+     *                  @OA\Property(property="clinic_sn", type="string(10)", example="XXXXXXXXXX"),
      *                  @OA\Property(property="parent_id", type="int(11)", example="0"),
      *              )
      *          )
@@ -177,10 +181,12 @@ class clinicController extends \core\PPP {
         $v->validate(
             array(
                 '診所' => $post['name'],
+                '診所機構代碼' => $post['clinic_sn'],
                 '上級診所' => $post['parent_id'],
             ),
             array(
                 '診所' => array('required', 'maxLen' => 64),
+                '診所機構代碼' => array('required', 'maxLen' => 10),
                 '上級診所' => array('required', 'maxLen' => 11),
             )
         );
@@ -195,6 +201,7 @@ class clinicController extends \core\PPP {
         $data = $database->insert_clinic(
             array(
                 'name' => $post['name'],
+                'clinic_sn' => $post['clinic_sn'],
                 'parent_id' => $post['parent_id'],
             )
         );
@@ -217,8 +224,9 @@ class clinicController extends \core\PPP {
      *          @OA\MediaType(
      *              mediaType="json",
      *              @OA\Schema(
-     *                  required={"clinic_id", "name", "parent_id"},
+     *                  required={"clinic_id", "clinic_sn", "name", "parent_id"},
      *                  @OA\Property(property="clinic_id", type="int(11)", example="2"),
+     *                  @OA\Property(property="clinic_sn", type="string(10)", example="XXXXXXXXXX"),
      *                  @OA\Property(property="name", type="string(64)", example="診所A"),
      *                  @OA\Property(property="parent_id", type="int(11)", example="0"),
      *              )
@@ -247,11 +255,13 @@ class clinicController extends \core\PPP {
         $v->validate(
             array(
                 '診所ID' => $post['clinic_id'],
+                '診所機構代碼' => $post['clinic_sn'],
                 '診所' => $post['name'],
                 '上級診所' => $post['parent_id'],
             ),
             array(
                 '診所ID' => array('required', 'maxLen' => 11),
+                '診所機構代碼' => array('required', 'maxLen' => 11),
                 '診所' => array('required', 'maxLen' => 64),
                 '上級診所' => array('required', 'maxLen' => 11),
             )
@@ -267,6 +277,7 @@ class clinicController extends \core\PPP {
         $data = $database->update_clinic(
             array(
                 'name' => $post['name'],
+                'clinic_sn' => $post['clinic_sn'],
                 'parent_id' => $post['parent_id'],
             ),
             array('clinic_id' => $post['clinic_id'])

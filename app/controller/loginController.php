@@ -20,6 +20,7 @@ use core\lib\IP;
  *      {"name"="診所使用者管理", "description"="診所使用者管理 API<br>(roles=999可以操作所有user，roles=3可以操作自己診所的users，roles=2只能優改自己的基本資料和密碼)"},
  *      {"name"="診所扣課管理", "description"="診所扣課管理 API"},
  *      {"name"="診所LOG", "description"="診所LOG API"},
+ *      {"name"="診所HIS", "description"="診所HIS API"},
  * })
  * @OA\SecurityScheme(
  *      securityScheme="Authorization",

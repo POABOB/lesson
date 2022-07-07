@@ -1,18 +1,18 @@
 <?php
 namespace app\controller;
 if ( ! defined('PPP')) exit('非法入口');
-use app\model\logModel;
+use app\model\hisModel;
 use core\lib\resModel;
 use core\lib\Validator;
 use core\common\auth;
 use core\lib\JWT;
 
-class logController extends \core\PPP {
+class hisController extends \core\PPP {
     /**
      * @OA\Get(
-     *      path="/api/logs", 
-     *      tags={"診所LOG"},
-     *      summary="獲取診所所有LOG紀錄",
+     *      path="/api/his/{clinic_sn}", 
+     *      tags={"診所HIS"},
+     *      summary="獲取診所所有申請紀錄",
      *      security={{"Authorization":{}}}, 
      *      @OA\Parameter(
      *          name="page",
@@ -30,18 +30,22 @@ class logController extends \core\PPP {
      *          @OA\Schema(type="integer"),
      *          example="50"
      *      ),
+     *      @OA\Parameter(
+     *          name="clinic_sn",
+     *          description="診所機構代碼(10碼)",
+     *          in = "path",
+     *          required=true,
+     *          @OA\Schema(type="string"),
+     *          example="AAAAAAAAAA"
+     *      ),
      *      @OA\Response(
      *          response="200", 
-     *          description="獲取診所所有LOG紀錄",
+     *          description="獲取診所所有申請紀錄",
      *          @OA\JsonContent(type="object",
      *              @OA\Property(property="code", type="integer", example=200),
      *              @OA\Property(property="message", example="null"),
      *              @OA\Property(property="data", type="array",
      *                  @OA\Items(type="object",
-     *                      @OA\Property(property="log_id", type="int(11)", example="1"),
-     *                      @OA\Property(property="user_id", type="int(11)", example="2"),
-     *                      @OA\Property(property="name", type="string(64)", example="USER2"),
-     *                      @OA\Property(property="verb", type="string(20)", example="申請"),
      *                      @OA\Property(property="lesson_id", type="int(11)", example="1"),
      *                      @OA\Property(property="customer_id", type="string(20)", example="xxxxx"),
      *                      @OA\Property(property="customer_name", type="string(64)", example="顧客A"),
@@ -60,18 +64,15 @@ class logController extends \core\PPP {
      *          ),
      *      ),
      *      @OA\Response(response="401", description="提交格式有誤"),
-     *      @OA\Response(response="403", description="ADMIN不能操作"),
      * )
      */
-    public function index_() {
-        auth::factory()->no_admin();
+    public function index_($clinic_sn) {
         $page = (isset($_GET['page']) && is_numeric($_GET['page'])) ? $_GET['page'] : 1;
         $pageNums = (isset($_GET['pageNums']) && is_numeric($_GET['pageNums'])) ? $_GET['pageNums'] : 50;
-        $payload = JWT::verifyToken(JWT::getHeaders());
-        $database = new logModel();
-        $data = $database->get_log(
+        $database = new hisModel();
+        $data = $database->get_his(
           array(
-            'clinic_id' => $payload['clinic_id'],
+            'clinic_sn' => $clinic_sn,
             'page' => $page,
             'pageNums' => $pageNums,
           )
