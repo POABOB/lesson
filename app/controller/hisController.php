@@ -13,7 +13,6 @@ class hisController extends \core\PPP {
      *      path="/api/his/{clinic_sn}", 
      *      tags={"診所HIS"},
      *      summary="獲取診所所有申請紀錄",
-     *      security={{"Authorization":{}}}, 
      *      @OA\Parameter(
      *          name="page",
      *          description="分頁",
