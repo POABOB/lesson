@@ -9,11 +9,13 @@ class lessonModel extends model {
         SELECT  l.lesson_id AS lesson_id, l.customer_id AS customer_id,
                 l.customer_name AS customer_name, l.lesson_sn AS lesson_sn,
                 l.lesson_name AS lesson_name, l.lesson_nums AS lesson_nums,
+                l.lesson_type AS lesson_type, l.lesson_note AS lesson_note,
+                l.lesson_each_price AS lesson_each_price, l.lesson_price AS lesson_price,
                 l.request_datetime AS request_datetime, l.expired_datetime AS expired_datetime,
                 l.request_clinic_id AS request_clinic_id, c1.name AS request_clinic_name,
                 l.response_clinic_id AS response_clinic_id, c2.name AS response_clinic_name,
                 l.request_parent_id AS request_parent_id, c3.name AS request_parent_name,
-                l.status AS status
+                l.status AS status, l.download_status AS download_status
         FROM    Lessons l
         LEFT JOIN Clinic c1
           ON c1.clinic_id = l.request_clinic_id
@@ -29,11 +31,13 @@ class lessonModel extends model {
         SELECT  l.lesson_id AS lesson_id, l.customer_id AS customer_id,
                 l.customer_name AS customer_name, l.lesson_sn AS lesson_sn,
                 l.lesson_name AS lesson_name, l.lesson_nums AS lesson_nums,
+                l.lesson_type AS lesson_type, l.lesson_note AS lesson_note,
+                l.lesson_each_price AS lesson_each_price, l.lesson_price AS lesson_price,
                 l.request_datetime AS request_datetime, l.expired_datetime AS expired_datetime,
                 l.request_clinic_id AS request_clinic_id, c1.name AS request_clinic_name,
                 l.response_clinic_id AS response_clinic_id, c2.name AS response_clinic_name,
                 l.request_parent_id AS request_parent_id, c3.name AS request_parent_name,
-                l.status AS status
+                l.status AS status, l.download_status AS download_status
         FROM    Lessons l
         LEFT JOIN Clinic c1
           ON c1.clinic_id = l.request_clinic_id
@@ -223,5 +227,4 @@ class lessonModel extends model {
         return -1;
       }
     }
-
 }
