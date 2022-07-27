@@ -168,9 +168,9 @@ class userController extends \core\PPP {
             )
         );
 
-        if($data !== -2) {
+        if($data == -2) {
             json(new resModel(401, '診所ID不存在'));
-        } else if($data !== -1) {
+        } else if($data == -1) {
             json(new resModel(400, '帳號已被使用...'));
         } else {
             json(new resModel(200, '新增成功'));
