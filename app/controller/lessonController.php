@@ -40,15 +40,8 @@ class lessonController extends \core\PPP {
      *                  @OA\Property(property="request", type="array",
      *                    @OA\Items(type="object",
      *                      @OA\Property(property="lesson_id", type="int(11)", example="1"),
-     *                      @OA\Property(property="customer_id", type="string(20)", example="xxxxx"),
-     *                      @OA\Property(property="customer_name", type="string(64)", example="顧客A"),
-     *                      @OA\Property(property="lesson_sn", type="string(20)", example="yyyyy"),
-     *                      @OA\Property(property="lesson_name", type="string(128)", example="課程A"),
-     *                      @OA\Property(property="lesson_nums", type="string(10)", example="2"),
-     *                      @OA\Property(property="lesson_type", type="string(20)", example="類別"),
-     *                      @OA\Property(property="lesson_note", type="string(128)", example="備註..."),
-     *                      @OA\Property(property="lesson_each_price", type="int(11)", example="9999"),
-     *                      @OA\Property(property="lesson_price", type="int(11)", example="9999"),
+     *                      @OA\Property(property="customer_info", type="string(64)", example="顧客姓名或手機"),
+     *                      @OA\Property(property="lesson_info", type="string(2000)", example="課程JSON"),
      *                      @OA\Property(property="request_clinic_id", type="int(11)", example="2"),
      *                      @OA\Property(property="request_clinic_name", type="string(64)", example="診所A"),
      *                      @OA\Property(property="request_parent_id", type="int(11)", example="1"),
@@ -64,14 +57,8 @@ class lessonController extends \core\PPP {
      *                  @OA\Property(property="response", type="array",
      *                    @OA\Items(type="object",
      *                      @OA\Property(property="lesson_id", type="int(11)", example="1"),
-     *                      @OA\Property(property="customer_id", type="string(20)", example="xxxxx"),
-     *                      @OA\Property(property="customer_name", type="string(64)", example="顧客A"),
-     *                      @OA\Property(property="lesson_sn", type="string(20)", example="yyyyy"),
-     *                      @OA\Property(property="lesson_name", type="string(128)", example="課程A"),
-     *                      @OA\Property(property="lesson_nums", type="string(10)", example="2"),
-     *                      @OA\Property(property="lesson_type", type="string(20)", example="類別"),
-     *                      @OA\Property(property="lesson_note", type="string(128)", example="備註..."),
-     *                      @OA\Property(property="lesson_each_price", type="int(11)", example="9999"),
+     *                      @OA\Property(property="customer_info", type="string(64)", example="顧客姓名或手機"),
+     *                      @OA\Property(property="lesson_info", type="string(2000)", example="課程JSON"),
      *                      @OA\Property(property="lesson_price", type="int(11)", example="9999"),
      *                      @OA\Property(property="request_clinic_id", type="int(11)", example="2"),
      *                      @OA\Property(property="request_clinic_name", type="string(64)", example="診所A"),
@@ -94,6 +81,8 @@ class lessonController extends \core\PPP {
      *                        @OA\Property(property="parent_id", type="int(11)", example="2"),
      *                      )
      *                  ), 
+     *                  @OA\Property(property="request_total_page", type="int(11)", example="5"), 
+     *                  @OA\Property(property="response_total_page", type="int(11)", example="10"), 
      *              ),
      *          ),
      *      ),
@@ -115,15 +104,35 @@ class lessonController extends \core\PPP {
             'pageNums' => $pageNums,
           )
         );
+
+        $count = $database->count_lesson(
+          array(
+            'clinic_id' => $payload['clinic_id'],
+            'parent_id' => $payload['parent_id'],
+            'page' => $page,
+            'pageNums' => $pageNums,
+          )
+        );
+
         foreach ($data['request'] as $key => $value) {
-          if(strtotime($data['request'][$key]['expired_datetime']) < strtotime(date('Y-m-d H:i:s')) && $data['request'][$key]['status'] == '待核准') {
+          if(strtotime($data['request'][$key]['expired_datetime']) < strtotime(date('Y-m-d H:i:s')) && $data['request'][$key]['status'] == '已核准') {
             $data['request'][$key]['status'] = '已過期';
+          }
+        }
+
+        foreach ($data['response'] as $key => $value) {
+          if(strtotime($data['response'][$key]['expired_datetime']) < strtotime(date('Y-m-d H:i:s')) && $data['response'][$key]['status'] == '已核准') {
+            $data['response'][$key]['status'] = '已過期';
           }
         }
 
         $data['response_list'] = array_filter($data['response_list'], function($val) use ($payload) {
           return intval($val['clinic_id']) !== intval($payload['clinic_id']);
         });
+
+        $data['request_total_page'] = floor($count['request_total_page'] / $pageNums + 1);
+        $data['response_total_page'] = floor($count['response_total_page'] / $pageNums + 1);
+
         json(new resModel(200, $data));
     }
 
@@ -135,19 +144,11 @@ class lessonController extends \core\PPP {
      *     security={{"Authorization":{}}},
      *      @OA\RequestBody(
      *          @OA\MediaType(
-     *              mediaType="json",
+     *              mediaType="application/json",
      *              @OA\Schema(
-     *                  required={"customer_id", "customer_name", "lesson_sn", "lesson_name", "lesson_nums", "lesson_type", "lesson_note", "lesson_each_price", "lesson_price", "expired_datetime", "response_clinic_id"},
-     *                  @OA\Property(property="customer_id", type="string(20)", example="xxxxx"),
-     *                  @OA\Property(property="customer_name", type="string(64)", example="顧客A"),
-     *                  @OA\Property(property="lesson_sn", type="string(20)", example="yyyyy"),
-     *                  @OA\Property(property="lesson_name", type="string(128)", example="課程A"),
-     *                  @OA\Property(property="lesson_nums", type="string(10)", example="2"),
-     *                  @OA\Property(property="lesson_type", type="string(20)", example="類別"),
-     *                  @OA\Property(property="lesson_note", type="string(128)", example="備註..."),
-     *                  @OA\Property(property="lesson_each_price", type="int(11)", example="9999"),
-     *                  @OA\Property(property="lesson_price", type="int(11)", example="9999"),
-     *                  @OA\Property(property="expired_datetime", type="string(20)", example="2022-08-07 23:59:59"),
+     *                  required={"customer_info", "lesson_info", "response_clinic_id"},
+     *                  @OA\Property(property="customer_info", type="string(64)", example="顧客姓名或手機"),
+     *                  @OA\Property(property="lesson_info", type="string(2000)", example="課程JSON"),
      *                  @OA\Property(property="response_clinic_id", type="string(20)", example="3"),
      *              )
      *          )
@@ -171,35 +172,18 @@ class lessonController extends \core\PPP {
         $payload = JWT::verifyToken(JWT::getHeaders());
         $post = array();
         $post = post_json();
-
         //Validation
         $v = new Validator();
         $v->validate(
             array(
-                '顧客ID' => $post['customer_id'],
+                '顧客資訊' => $post['customer_info'],
                 '申請診所ID' => $post['response_clinic_id'],
-                '顧客姓名' => $post['customer_name'],
-                '課程編號' => $post['lesson_sn'],
-                '課程名稱' => $post['lesson_name'],
-                '剩餘單位' => $post['lesson_nums'],
-                '類別' => $post['lesson_type'],
-                '備註' => $post['lesson_note'],
-                '單價' => $post['lesson_each_price'],
-                '完款' => $post['lesson_price'],
-                '期限' => $post['expired_datetime'],
+                '課程資訊' => $post['lesson_info'],
             ),
             array(
-                '顧客ID' => array('required', 'maxLen' => 20),
+                '顧客資訊' => array('required', 'maxLen' => 64),
                 '申請診所ID' => array('required', 'maxLen' => 11),
-                '顧客姓名' => array('required', 'maxLen' => 64),
-                '課程編號' => array('required', 'maxLen' => 20),
-                '課程名稱' => array('required', 'maxLen' => 64),
-                '剩餘單位' => array('required', 'maxLen' => 10),
-                '類別' => array('required', 'maxLen' => 20),
-                '備註' => array('required', 'maxLen' => 128),
-                '單價' => array('required', 'maxLen' => 11),
-                '完款' => array('required', 'maxLen' => 11),
-                '期限' => array('required', 'maxLen' => 20),
+                '課程資訊' => array('required', 'maxLen' => 2000),
             )
         );
 
@@ -211,17 +195,10 @@ class lessonController extends \core\PPP {
         $database = new lessonModel();
         $data = $database->insert_lesson(
             array(
-              'customer_id' => $post['customer_id'],
-              'customer_name' => $post['customer_name'],
-              'lesson_sn' => $post['lesson_sn'],
-              'lesson_name' => $post['lesson_name'],
-              'lesson_nums' => $post['lesson_nums'],
-              'lesson_type' => $post['lesson_type'],
-              'lesson_note' => $post['lesson_note'],
-              'lesson_each_price' => $post['lesson_each_price'],
-              'lesson_price' => $post['lesson_price'],
+              'customer_info' => $post['customer_info'],
+              'lesson_info' => $post['lesson_info'],
               'request_datetime' => date('Y-m-d H:i:s'),
-              'expired_datetime' => $post['expired_datetime'],
+              'expired_datetime' => "9999-12-31 00:00:00",
               'request_clinic_id' => $payload['clinic_id'],
               'response_clinic_id' => $post['response_clinic_id'],
               'request_parent_id' => $payload['parent_id'],
@@ -253,7 +230,7 @@ class lessonController extends \core\PPP {
      *     security={{"Authorization":{}}},
      *      @OA\RequestBody(
      *          @OA\MediaType(
-     *              mediaType="json",
+     *              mediaType="application/json",
      *              @OA\Schema(
      *                  required={"lesson_id"},
      *                  @OA\Property(property="lesson_id", type="int(11)", example="1"),
@@ -326,7 +303,7 @@ class lessonController extends \core\PPP {
      *     security={{"Authorization":{}}},
      *      @OA\RequestBody(
      *          @OA\MediaType(
-     *              mediaType="json",
+     *              mediaType="application/json",
      *              @OA\Schema(
      *                  required={"lesson_id"},
      *                  @OA\Property(property="lesson_id", type="int(11)", example="2"),
@@ -367,7 +344,10 @@ class lessonController extends \core\PPP {
 
         $database = new lessonModel();
         $return = $database->approve_lesson(
-            array('status' => '已核准'),
+            array(
+              'status' => '已核准',
+              'expired_datetime' => date('Y-m-d H:i:s', strtotime('4 hour')),
+            ),
             array('lesson_id' => $post['lesson_id']),
             array(
               'user_id' => $payload['user_id'],
@@ -399,7 +379,7 @@ class lessonController extends \core\PPP {
      *     security={{"Authorization":{}}},
      *      @OA\RequestBody(
      *          @OA\MediaType(
-     *              mediaType="json",
+     *              mediaType="application/json",
      *              @OA\Schema(
      *                  required={"lesson_id"},
      *                  @OA\Property(property="lesson_id", type="int(11)", example="2"),

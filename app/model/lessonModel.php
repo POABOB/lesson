@@ -6,11 +6,8 @@ class lessonModel extends model {
     public function get_lesson($where = array(), $para = array(), $table = 'Lessons') {
       $p = ($where['page'] - 1) * $where['pageNums'];
       $data['request'] = $this->query("
-        SELECT  l.lesson_id AS lesson_id, l.customer_id AS customer_id,
-                l.customer_name AS customer_name, l.lesson_sn AS lesson_sn,
-                l.lesson_name AS lesson_name, l.lesson_nums AS lesson_nums,
-                l.lesson_type AS lesson_type, l.lesson_note AS lesson_note,
-                l.lesson_each_price AS lesson_each_price, l.lesson_price AS lesson_price,
+        SELECT  l.lesson_id AS lesson_id, l.customer_info AS customer_info,
+                l.lesson_info AS lesson_info,
                 l.request_datetime AS request_datetime, l.expired_datetime AS expired_datetime,
                 l.request_clinic_id AS request_clinic_id, c1.name AS request_clinic_name,
                 l.response_clinic_id AS response_clinic_id, c2.name AS response_clinic_name,
@@ -28,11 +25,8 @@ class lessonModel extends model {
         LIMIT {$p}, {$where['pageNums']};
       ")->fetchAll(\PDO::FETCH_ASSOC);
       $data['response'] = $this->query("
-        SELECT  l.lesson_id AS lesson_id, l.customer_id AS customer_id,
-                l.customer_name AS customer_name, l.lesson_sn AS lesson_sn,
-                l.lesson_name AS lesson_name, l.lesson_nums AS lesson_nums,
-                l.lesson_type AS lesson_type, l.lesson_note AS lesson_note,
-                l.lesson_each_price AS lesson_each_price, l.lesson_price AS lesson_price,
+        SELECT  l.lesson_id AS lesson_id, l.customer_info AS customer_info,
+                l.lesson_info AS lesson_info,
                 l.request_datetime AS request_datetime, l.expired_datetime AS expired_datetime,
                 l.request_clinic_id AS request_clinic_id, c1.name AS request_clinic_name,
                 l.response_clinic_id AS response_clinic_id, c2.name AS response_clinic_name,
@@ -226,5 +220,11 @@ class lessonModel extends model {
         $this->pdo->rollBack();
         return -1;
       }
+    }
+
+    public function count_lesson($where = array(), $para = array(), $table = 'Lessons') {
+      $data["request_total_page"] = $this->count($table, array("request_clinic_id" => $where['clinic_id']));
+      $data["response_total_page"] = $this->count($table, array("response_clinic_id" => $where['clinic_id']));
+      return $data;
     }
 }
